@@ -1,178 +1,213 @@
 //
 //  ViewController.swift
-//  TaskGame
+//  Formdata
 //
-//  Created by Nilu Technologies 1 on 17/11/21.
+//  Created by Mac Mini on 18/08/21.
 //
 
 import UIKit
-
-//struct Quiz {
-//    var question : String
-//    var answer:[String]
-//    var state : Int
-//    }
-
-class ViewController: UIViewController {
-    var quiz = [QuestionList]()
-    var buttonCounter = 6
-    var correctAnswerIndex = 0
-    @IBOutlet var lblQuestion: UILabel!
-    @IBOutlet var lblQuestion1to5: UILabel!
-    @IBOutlet var imgQuestionMark: UIImageView!
-    @IBOutlet var QuestionViewCenter: UIView!
-    @IBOutlet var ViewTop: GradientView!
-    @IBOutlet var BtnOption1: UIButton!
-    @IBOutlet var BtnOption2: UIButton!
-    @IBOutlet var BtnOption3: UIButton!
-    @IBOutlet var BtnOption4: UIButton!
-    @IBOutlet var BtnNextQuestion: UIButton!
+struct StateCity {
+  //  var country:[String]
+    var city:[String]
+    var state:String
     
-    @IBOutlet var lblCorrectInCorrect: UILabel!
-    
-
+}
+struct  StateCountry{
+    var state:[StateCity]
+    var country:String
+}
+class ViewController: UIViewController,UITextFieldDelegate,UIPickerViewDataSource, UIPickerViewDelegate {
    
+    var val = [StateCity]()
+    var val2 = [StateCountry]()
+
+    @IBOutlet var txtname: UITextField!
+    @IBOutlet var txtemail: UITextField!
+    
+    @IBOutlet var txtpan: UITextField!
+    
+    @IBOutlet var txtnum: UITextField!
+    
+    @IBOutlet var txtbirthplace: UITextField!
+    
+    @IBOutlet var btnsave: UIButton!
+    
+    var  pickerview = UIPickerView()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        ButtonUI()
-        BtnNext(BtnNextQuestion)
+        txtname.delegate = self
+        txtemail.delegate = self
+        txtnum.delegate = self
+        txtpan.delegate = self
+        txtbirthplace.delegate = self
+        
+        pickerview.delegate = self
+        pickerview.dataSource = self
+        
+        txtbirthplace.inputView = pickerview
+        txtbirthplace.textAlignment = .center
+        
+        let numberToolbar = UIToolbar(frame:CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 50))
+        numberToolbar.barStyle = .default
+        numberToolbar.items = [
+        
+        UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
+        UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(didTapdone))]
+        numberToolbar.sizeToFit()
+        txtbirthplace.inputAccessoryView = numberToolbar
+        val.append(StateCity(city: ["ahemedabad","rajkot"], state: "gujarat"))
+        val.append(StateCity(city: ["avbd","vcdv","dgff"], state: "maharastra"))
+        val.append(StateCity(city: ["sdf","fdg","hgh"], state: "up"))
+        val2.append(StateCountry(state: val, country: "india"))
+        
     }
     
-    func ButtonUI(){
-        QuestionViewCenter.layer.cornerRadius = 20
-        QuestionViewCenter.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.45).cgColor
-        QuestionViewCenter.layer.shadowOffset = CGSize(width: 0.0, height: 2.0)
-        QuestionViewCenter.layer.shadowOpacity = 1.0
-        QuestionViewCenter.layer.shadowRadius = 4
-        BtnOption1.layer.cornerRadius = 15
-        BtnOption1.layer.borderWidth = 1
-        BtnOption1.layer.borderColor = UIColor.lightGray.cgColor
-        BtnOption2.layer.cornerRadius = 15
-        BtnOption2.layer.borderWidth = 1
-        BtnOption2.layer.borderColor = UIColor.lightGray.cgColor
-        BtnOption3.layer.cornerRadius = 15
-        BtnOption3.layer.borderWidth = 1
-        BtnOption3.layer.borderColor = UIColor.lightGray.cgColor
-        BtnOption4.layer.cornerRadius = 15
-        BtnOption4.layer.borderWidth = 1
-        BtnOption4.layer.borderColor = UIColor.lightGray.cgColor
-        BtnNextQuestion.layer.cornerRadius = 15
-        BtnOption1.showsTouchWhenHighlighted = true
-        imgQuestionMark.layer.cornerRadius = 35
-        
+    var isValidContact: Bool {
+            let phoneNumberRegex = "^[6-9]\\d{9}$"
+            let phoneTest = NSPredicate(format: "SELF MATCHES %@", phoneNumberRegex)
+            let isValidPhone = phoneTest.evaluate(with: self)
+            return isValidPhone
+        }
+    
+    @objc private func didTapdone(){
+        txtbirthplace.resignFirstResponder()
     }
-    @IBAction func btnAnswercheck(_ sender: Any) {
-        switch (sender as AnyObject).tag {
-        case 1:
-            BtnOption1.layer.borderWidth = 2
-            BtnOption1.layer.borderColor = UIColor.blue.cgColor
-        case 2:
-            BtnOption2.layer.borderWidth = 2
-            BtnOption2.layer.borderColor = UIColor.blue.cgColor
-        case 3:
-            BtnOption3.layer.borderWidth = 2
-            BtnOption3.layer.borderColor = UIColor.blue.cgColor
-        case 4:
-            BtnOption4.layer.borderWidth = 2
-            BtnOption4.layer.borderColor = UIColor.blue.cgColor
-        default:
-            print("")
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+       return 3
+    }
+
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+     
+        if component == 0{
+            return val.count
         }
-        if correctAnswerIndex == 0{
-            BtnOption1.layer.borderWidth = 2
-            BtnOption1.layer.borderColor = UIColor.green.cgColor
+        else if component == 1 {
+            let selectCountry = pickerView.selectedRow(inComponent: 0)
+            return val2.count
         }
-        else if correctAnswerIndex == 1{
-            BtnOption2.layer.borderWidth = 2
-            BtnOption2.layer.borderColor = UIColor.green.cgColor
+
+       else{
+            let selectedstate = pickerView.selectedRow(inComponent: 0)
+            let selectCountry = pickerView.selectedRow(inComponent: 1)
+            return val2[selectCountry].state[selectedstate].city.count
         }
-        else if correctAnswerIndex == 2{
-            BtnOption3.layer.borderWidth = 2
-            BtnOption3.layer.borderColor = UIColor.green.cgColor
+       }
+       func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        if component == 0{
+            return val[row].state
         }
-        else if correctAnswerIndex == 3{
-           // BtnOption4.layer.borderWidth = 2
-            BtnOption4.layer.borderColor = UIColor.green.cgColor
+        else if component == 1 {
+            let selectedCountry = pickerView.selectedRow(inComponent: 0)
+            return val2[row].country
         }
+        else{
+            let selectedstate = pickerView.selectedRow(inComponent: 0)
+            let selectCountry = pickerView.selectedRow(inComponent: 1)
+          
+          return val2[selectCountry].state[selectedstate].city[row]
+        }
+}
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+    
+      //  val2[selectCountry].state[selectedstate].city.count
+       // txtbirthplace.text = 
         
+       
+        pickerView.reloadAllComponents()
+        self.view.endEditing(true)
+    }
+    @IBAction func btnSav(_ sender: UIButton) {
+        if txtname.text?.isEmpty ?? true {
+            let alert = UIAlertController(title: "Alert", message: "name is empty", preferredStyle: .alert)
+               alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+               present(alert, animated: true, completion: nil)
+           } else {
+               print("textField has some text")
+           }
+        if((txtemail.text?.isValidEmail()) != nil){
+            print("valid")
+        }else{
+            print("mot valid")
+        }
+
+        
+        
+        if txtpan.text?.isEmpty ?? true {
+            let alert = UIAlertController(title: "Alert", message: "number is empty", preferredStyle: .alert)
+               alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+               present(alert, animated: true, completion: nil)
+           } else {
+               print("textField has some text")
+           }
+        
+     
+        if ((txtnum.text?.isValidContact) != nil){
+            print("is valid")
+        }else{
+            print("not valid")
+        }
+    }
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+       
+        if textField == txtname {
+            let maxLength = 10
+            let currentString: NSString = txtname.text! as NSString
+               let newString: NSString =
+                currentString.replacingCharacters(in: range, with: string) as NSString
+            if !(newString.length <= maxLength)  {
+                txtemail.becomeFirstResponder()
+            }
+
+               return newString.length <= maxLength
+        }
+        else{
+            return true
+        }
 
     }
-    @IBAction func BtnNext(_ sender: UIButton) {
-        buttonCounter -= 1
-        switch (buttonCounter) {
-        case 1:
-            lblQuestion.text = "1 Who is the Currrent PM of India?..."
-            BtnOption1.setTitle("Amit Shah", for: .normal)
-            BtnOption2.setTitle("Narendra Modi" , for: .normal)
-            BtnOption3.setTitle("Vijay Rupani", for: .normal)
-            BtnOption4.setTitle("Yogi Aadhityanath", for: .normal)
-            correctAnswerIndex = 1
-            
-            break;
-            
-        case 2:
-            if buttonCounter >= 1{
-                BtnOption1.layer.borderColor = UIColor.clear.cgColor
-                BtnOption1.layer.borderColor =  UIColor.lightGray.cgColor
-                BtnOption2.layer.borderColor =  UIColor.lightGray.cgColor
-                BtnOption3.layer.borderColor =  UIColor.lightGray.cgColor
-                BtnOption4.layer.borderColor =  UIColor.lightGray.cgColor
-            }
-            lblQuestion.text = "2 Name of the first university of India?..."
-            BtnOption1.setTitle("Dronacharya University", for: .normal)
-            BtnOption2.setTitle("Nalanda University" , for: .normal)
-            BtnOption3.setTitle("Jawahar University", for: .normal)
-            BtnOption4.setTitle("Taxshila University", for: .normal)
-            correctAnswerIndex = 1
-            break;
-        case 3:
-            if buttonCounter >= 2{
-                BtnOption1.layer.borderColor =  UIColor.lightGray.cgColor
-                BtnOption2.layer.borderColor =  UIColor.lightGray.cgColor
-                BtnOption3.layer.borderColor =  UIColor.lightGray.cgColor
-                BtnOption4.layer.borderColor =  UIColor.lightGray.cgColor            }
-            lblQuestion.text = "3 Name of First Indian who reached south pole?."
-            BtnOption1.setTitle("Col. I K Bajaj", for: .normal)
-            BtnOption2.setTitle("R.N. Shukla" , for: .normal)
-            BtnOption3.setTitle("V.R. Gill", for: .normal)
-            BtnOption4.setTitle("D.B. Mahawar", for: .normal)
-            correctAnswerIndex = 0
-            break;
-        case 4:
-            if buttonCounter >= 3{
-                BtnOption1.layer.borderColor =  UIColor.lightGray.cgColor
-                BtnOption2.layer.borderColor =  UIColor.lightGray.cgColor
-                BtnOption3.layer.borderColor =  UIColor.lightGray.cgColor
-                BtnOption4.layer.borderColor =  UIColor.lightGray.cgColor
-            }
-            lblQuestion.text = "4 Name of the first Indian woman ruler ?"
-            BtnOption1.setTitle("Saira Begum", for: .normal)
-            BtnOption2.setTitle("Laxmi Bai" , for: .normal)
-            BtnOption3.setTitle("Razia Sultan on Delhi's thronel", for: .normal)
-            BtnOption4.setTitle("indira gandhi", for: .normal)
-            correctAnswerIndex =  2
-            break;
-        case 5:
-            if buttonCounter >= 4{
-                BtnOption1.layer.borderColor =  UIColor.lightGray.cgColor
-                BtnOption2.layer.borderColor =  UIColor.lightGray.cgColor
-                BtnOption3.layer.borderColor =  UIColor.lightGray.cgColor
-                BtnOption4.layer.borderColor =  UIColor.lightGray.cgColor
-            }
-            lblQuestion.text = "5 Name of first foreign recipient of Bharat Ratna?"
-            BtnOption1.setTitle("R.N. Shukla", for: .normal)
-            BtnOption2.setTitle("V.R. Gill" , for: .normal)
-            BtnOption3.setTitle("D.B. Mahawar", for: .normal)
-            BtnOption4.setTitle("Khan Abdul Gaffar Khan", for: .normal)
-            correctAnswerIndex =  3
-            break;
-            
-      
-            
-        default:
-        print("nothing")
-        }
-        
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        txtname.resignFirstResponder()
+        txtemail.becomeFirstResponder()
+        txtemail.resignFirstResponder()
+        txtnum.becomeFirstResponder()
+        txtnum.resignFirstResponder()
+        txtpan.becomeFirstResponder()
+        txtnum.resignFirstResponder()
+        txtbirthplace.becomeFirstResponder()
+        return true
     }
+        
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        txtname.resignFirstResponder()
+        txtemail.resignFirstResponder()
+        txtnum.resignFirstResponder()
+        txtpan.resignFirstResponder()
+        pickerview.isHidden = true
+        
+        print("hide keyboard")
+    }
+}
+
+extension String{
+    var isValidContact: Bool {
+            let phoneNumberRegex = "^[6-9]\\d{9}$"
+            let phoneTest = NSPredicate(format: "SELF MATCHES %@", phoneNumberRegex)
+            let isValidPhone = phoneTest.evaluate(with: self)
+            return isValidPhone
+        }
+    func isValidEmail() -> Bool {
+          let regex = try! NSRegularExpression(pattern: "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$", options: .caseInsensitive)
+          return regex.firstMatch(in: self, options: [], range: NSRange(location: 0, length: count)) != nil
+      }
+//    var isEmail: Bool {
+//            do {
+//                let regex = try NSRegularExpression(pattern: "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}", options: .caseInsensitive)
+//                return regex.firstMatch(in: self, options: NSRegularExpression.MatchingOptions(rawValue: 0), range: NSMakeRange(0, self.count)) != nil
+//            } catch {
+//                return false
+//            }
+//        }
 }
 
