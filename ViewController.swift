@@ -7,7 +7,7 @@
 
 import UIKit
 struct StateCity {
-  //  var country:[String]
+  
     var city:[String]
     var state:String
     
