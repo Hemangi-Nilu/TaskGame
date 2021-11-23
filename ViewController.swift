@@ -166,6 +166,7 @@ class ViewController: UIViewController,UITextFieldDelegate,UIPickerViewDataSourc
         }
 
     }
+  // delegate method of textfield
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         txtname.resignFirstResponder()
         txtemail.becomeFirstResponder()
@@ -189,7 +190,7 @@ class ViewController: UIViewController,UITextFieldDelegate,UIPickerViewDataSourc
         print("hide keyboard")
     }
 }
-
+//extension string
 extension String{
     var isValidContact: Bool {
             let phoneNumberRegex = "^[6-9]\\d{9}$"
